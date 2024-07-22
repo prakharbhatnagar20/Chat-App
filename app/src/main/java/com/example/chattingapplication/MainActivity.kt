@@ -12,9 +12,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.chattingapplication.screens.ChatListScreen
 import com.example.chattingapplication.screens.LoginScreen
+import com.example.chattingapplication.screens.ProfileScreen
 import com.example.chattingapplication.screens.SignUpScreen
+import com.example.chattingapplication.screens.SingleChatScreen
+import com.example.chattingapplication.screens.StatusList
 import com.example.chattingapplication.ui.theme.ChattingApplicationTheme
+import dagger.hilt.android.AndroidEntryPoint
 
 sealed class DestinationScreen(var route: String){
     object SignUp : DestinationScreen("signup")
@@ -24,11 +29,13 @@ sealed class DestinationScreen(var route: String){
     object SingleChat : DestinationScreen("singleChat/{ChatId}"){
         fun createRoute(id: String) = "singleChat/$id"
     }
+    object StatusList : DestinationScreen("statusList")
     object SingleStatus : DestinationScreen("singleStatus/{StatusId}"){
         fun createRoute(userId: String) = "singleStatus/$userId"
     }
 }
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,8 +61,25 @@ class MainActivity : ComponentActivity() {
                 SignUpScreen(navController, vm)
             }
             composable(DestinationScreen.Login.route){
-                LoginScreen()
+                LoginScreen(vm, navController = navController)
             }
+            composable(DestinationScreen.ChatList.route){
+                ChatListScreen(navController, vm)
+            }
+            composable(DestinationScreen.SingleChat.route){
+               val chatId = it.arguments?.getString("ChatId")
+                chatId?.let {
+                    SingleChatScreen(navController = navController, vm = vm, chatId)
+                }
+            }
+
+            composable(DestinationScreen.StatusList.route){
+                StatusList(navController,vm)
+            }
+            composable(DestinationScreen.Profile.route){
+                ProfileScreen(navController, vm)
+            }
+
             
         }
     }
