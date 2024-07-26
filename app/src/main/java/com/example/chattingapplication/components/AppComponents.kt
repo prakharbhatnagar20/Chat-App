@@ -350,14 +350,16 @@ fun CommonDivider(){
 @Composable
 fun TextTitle(txt: String){
     Text(text = txt, fontWeight = FontWeight.Bold, fontSize = 35.sp, modifier = Modifier.padding(8.dp))
+    Text(text = "Nearby Friends", fontWeight = FontWeight.Bold, fontSize = 20.sp, modifier = Modifier.padding(8.dp) )
 
 }
 @Composable
-fun CommonRow(imageUrl: String?, name: String?, onItemCLick:()-> Unit){
+fun CommonRow(imageUrl: String?, name: String?,textColor: Color ,onItemCLick:()-> Unit){
 
     Row(modifier = Modifier
         .fillMaxWidth()
         .height(75.dp)
+        .background(textColor)
         .clickable { onItemCLick.invoke() },
         verticalAlignment = Alignment.CenterVertically) {
         CommonImage(data = imageUrl,

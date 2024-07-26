@@ -1,13 +1,10 @@
 package com.example.chattingapplication.screens
 
-import android.app.Dialog
-import android.icu.text.CaseMap.Title
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -16,7 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,18 +26,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.chattingapplication.DestinationScreen
 import com.example.chattingapplication.LCViewModel
 import com.example.chattingapplication.components.CommonRow
 import com.example.chattingapplication.components.TextTitle
 import com.example.chattingapplication.navigateTo
-import com.example.chattingapplication.ui.theme.ChattingApplicationTheme
 
 @Composable
 fun ChatListScreen(navController: NavController, vm: LCViewModel){
@@ -75,7 +66,7 @@ fun ChatListScreen(navController: NavController, vm: LCViewModel){
                         .weight(1f),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center) {
-                        Text(text = "No Chats Availabe")
+                        Text(text = "No Chats Available")
 
                     }
                 }else{
@@ -87,7 +78,14 @@ fun ChatListScreen(navController: NavController, vm: LCViewModel){
                             }else{
                                 chat.user1
                             }
-                            CommonRow(imageUrl = chatUser.imageUrl, name =chatUser.name ) {
+                            val textColor = if (chat.user1.location == chat.user2.location) {
+
+                                Color(color = 0xFFCCD5FF)
+                            } else {
+                                Color(color = 0xFFC884A6)
+
+                            }
+                            CommonRow(imageUrl = chatUser.imageUrl, name =chatUser.name, textColor=  textColor) {
                                 chat.chatId?.let{
                                     navigateTo(navController, DestinationScreen.SingleChat.createRoute(id = it))
 
@@ -100,7 +98,8 @@ fun ChatListScreen(navController: NavController, vm: LCViewModel){
                 }
                 BottomNavigationMenu(
                     selectedItem = BottomNavigationMenu.CHATLIST,
-                    navController = navController
+                    navController = navController,
+                    modifier = Modifier
                 )
 
             }
@@ -134,7 +133,7 @@ fun FAB(
             },
             title = { Text(text = "Add Chat")},
             text = {
-                OutlinedTextField(value = addChatNumber.value, onValueChange = {addChatNumber.value = it},
+                OutlinedTextField(value = addChatNumber.value, label = { Text(text = "Enter Your Friend's Phone No.")} ,onValueChange = {addChatNumber.value = it},
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
             }

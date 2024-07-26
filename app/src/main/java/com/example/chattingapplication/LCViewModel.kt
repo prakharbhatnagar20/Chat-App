@@ -168,36 +168,73 @@ class LCViewModel @Inject constructor(
 
 
     }
-    fun createOrUpdateProfile(name: String?=null,email: String?=null ,number: String?=null, imageurl: String?=null){
-        var uid = auth.currentUser?.uid
-        val userData = UserData(
-            userId = uid,
-            name = name,
-            number = number,
-            imageUrl = imageurl?: userData.value?.imageUrl
-
-        )
-        uid.let {
+    fun createOrUpdateProfile(name: String? = null, email: String? = null, number: String? = null, imageurl: String? = null, location: String? = null) {
+        val uid = auth.currentUser?.uid
+        uid?.let {
             inProcess.value = true
-            if (uid != null) {
-                db.collection(USER_NODE).document(uid).get().addOnSuccessListener {
-                    if(it.exists()){
-
-                    }else{
-                        db.collection(USER_NODE).document(uid).set(userData)
-                        inProcess.value = false
-                        getUserData(uid)
-                    }
-                }.addOnFailureListener{
-                    handleException(it, "Cannot retrieve user")
+            db.collection(USER_NODE).document(uid).get().addOnSuccessListener { document ->
+                val currentData = document.toObject(UserData::class.java)
+                val userData = UserData(
+                    userId = uid,
+                    name = name ?: currentData?.name,
+                    number = number ?: currentData?.number,
+                    imageUrl = imageurl ?: currentData?.imageUrl,
+                    location = location ?: currentData?.location
+                )
+                db.collection(USER_NODE).document(uid).set(userData).addOnCompleteListener {
+                    inProcess.value = false
+                    getUserData(uid)
+                    updateChatNodes(userData)
                 }
+            }.addOnFailureListener {
+                handleException(it, "Cannot retrieve user")
+                inProcess.value = false
             }
-
-
         }
-
     }
 
+    fun updateChatNodes(updatedUserData: UserData) {
+        db.collection(CHATS).where(Filter.or(
+            Filter.equalTo("user1.userId", updatedUserData.userId),
+            Filter.equalTo("user2.userId", updatedUserData.userId)
+        )).get().addOnSuccessListener { chatSnapshot ->
+            chatSnapshot.documents.forEach { chatDocument ->
+                val chatData = chatDocument.toObject<ChatData>()
+                val updatedChat = chatData?.copy(
+                    user1 = if (chatData.user1.userId == updatedUserData.userId) {
+                        ChatUser(
+                            userId = updatedUserData.userId,
+                            name = updatedUserData.name,
+                            imageUrl = updatedUserData.imageUrl,
+                            number = updatedUserData.number,
+                            location = updatedUserData.location
+                        )
+                    } else chatData.user1,
+                    user2 = if (chatData.user2.userId == updatedUserData.userId) {
+                        ChatUser(
+                            userId = updatedUserData.userId,
+                            name = updatedUserData.name,
+                            imageUrl = updatedUserData.imageUrl,
+                            number = updatedUserData.number,
+                            location = updatedUserData.location
+                        )
+                    } else chatData.user2
+                )
+
+                updatedChat?.let {
+                    db.collection(CHATS).document(chatDocument.id).set(it)
+                        .addOnSuccessListener {
+                            Log.d("Live ChatApp", "Chat node updated successfully for user ${updatedUserData.userId}")
+                        }
+                        .addOnFailureListener { exception ->
+                            handleException(exception, "Failed to update chat node for user ${updatedUserData.userId}")
+                        }
+                }
+            }
+        }.addOnFailureListener { exception ->
+            handleException(exception, "Failed to retrieve chats for updating")
+        }
+    }
     private fun getUserData(uid: String) {
         inProcess.value = true
         db.collection(USER_NODE).document(uid).addSnapshotListener{
@@ -257,9 +294,10 @@ class LCViewModel @Inject constructor(
                                     userData.value?.userId,
                                     userData.value?.name,
                                     userData.value?.imageUrl,
-                                    userData.value?.number
+                                    userData.value?.number,
+                                    userData.value?.location
                                 ),
-                                ChatUser(chatPartner.userId,chatPartner.name, chatPartner.imageUrl, chatPartner.number)
+                                ChatUser(chatPartner.userId,chatPartner.name, chatPartner.imageUrl, chatPartner.number, chatPartner.location)
                             )
                             db.collection(CHATS).document(id).set(chat)
                         }
@@ -279,6 +317,15 @@ class LCViewModel @Inject constructor(
         val msg =
             Message(userData.value?.userId, message, time)
         db.collection(CHATS).document(chatID).collection(MESSAGE).document().set(msg)
+
+    }
+
+    fun signUpValidation(number: String): Boolean{
+        if (number.length<10){
+            return false
+        }
+        return true
+
 
     }
 }
