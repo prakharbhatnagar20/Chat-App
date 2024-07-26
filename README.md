@@ -13,6 +13,8 @@ Pal App is a social media platform designed to help users discover and connect w
 
 ## Screenshots
 <img src="images/screenshot1.jpg" alt="Screenshot" width="200" height="500">
+<img src="images/screenshot2.jpg" alt="Screenshot" width="200" height="500">
+<img src="images/screenshot3.jpg" alt="Screenshot" width="200" height="500">
 
 
 
