@@ -12,7 +12,7 @@ Pal App is a social media platform designed to help users discover and connect w
 - **Notifications**: Receive alerts for new messages and nearby users.
 
 ## Screenshots
-![Screenshot](images/screenshot1.jpg)
+<img src="images/screenshot1.jpg" alt="Screenshot" width="400" height="300">
 
 
 
