@@ -7,15 +7,15 @@ plugins {
 }
 
 android {
-    namespace = "com.example.chattingapplication"
+    namespace = "com.pal.chattingapplication"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.chattingapplication"
+        applicationId = "com.pal.chattingapplication"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -74,6 +74,15 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("com.google.dagger:hilt-android:2.51.1")
     ksp("com.google.dagger:hilt-compiler:2.51.1")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")
+    implementation("androidx.compose.material3:material3")
+
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+
 
     // For instrumentation tests
     androidTestImplementation("com.google.dagger:hilt-android-testing:2.51.1")
